@@ -4,14 +4,13 @@
           unifd/2
       ]).
 :- reexport(library(clpfd)).
+:- autoload(library(apply), [maplist/4, foldl/4, maplist/3]).
+:- autoload(library(ordsets), [list_to_ord_set/2, ord_subtract/3]).
+:- autoload(library(pairs), [pairs_keys_values/3, group_pairs_by_key/2]).
+:- autoload(library(rbtrees), [list_to_rbtree/2, rb_map/3, rb_lookup/3, 
+                               rb_empty/1, rb_insert_new/4]).
+:- autoload(library(terms), [same_functor/2, mapargs/3]).
 
-:- use_module(library(apply), [maplist/4, foldl/4, maplist/3]).
-:- use_module(library(pairs), [pairs_keys_values/3, 
-                   group_pairs_by_key/2]).
-:- use_module(library(rbtrees), [list_to_rbtree/2, rb_map/3, 
-                 rb_lookup/3, rb_empty/1, 
-                 rb_insert_new/4]).
-:- use_module(library(terms), [same_functor/2, mapargs/3]).
 
 cons(Op, A, B, C) :-
     $(functor(C, Op, 2)),
@@ -27,14 +26,22 @@ compile_multiop(Cases, Cmop) :-
     $(length(Is, Arity)),
     $(compile_multiop_(Arity, Cases, Cmop)).
 
-compile_multiop_(Arity, Cases, forall([OVar|IVars], Expr)) :-
+compile_multiop_(Arity, Cases, us_es([OVar|IVars], Existentials)) :-
     $(length(IVars, Arity)),
+    $(term_variables_excluding(Cases, Existentials, [OVar|IVars])),
     $(maplist(compile_case(IVars, OVar), Cases, [C|Cs])),
-    $(foldl(cons(#\/), Cs, C, Expr)).
+    $(foldl(cons(#\/), Cs, C, Expr)),
+    $(call(Expr)).
 
-apply_multiop(forall(Vars, Expr), Is, O) =>
-    $(copy_term(Vars, Expr, [O|Is], Expr_)),
-    call(Expr_).
+term_variables_excluding(Term, Vars, Exclude) :-
+    $(term_variables(Term, All)),
+    $(list_to_ord_set(All, AllS)),
+    $(list_to_ord_set(Exclude, ExcludeS)),
+    $(ord_subtract(AllS, ExcludeS, Vars)).
+
+
+apply_multiop(us_es(Us, Es), Is, O) =>
+    $(copy_term(Us-Es, [O|Is]-Es)).
 
 compile_multialg(Alg, CAlg) :-
     $(sort(Alg, SortedAlg)),
