@@ -23,7 +23,7 @@ test(nondet, X == 1) :-
 
 test(unwrapped_var,
      [error(instantiation_error(_),
-	    context(_, "Variables must be wrapped with #/1"))]) :-
+	    context(_, "Variables must be wrapped with (#)/1"))]) :-
     compile_multialg([z-0], Alg),
     [X, Y] ins 0..2,
     unifd(Alg, X = Y).
