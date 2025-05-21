@@ -41,7 +41,7 @@ term_variables_excluding(Term, Vars, Exclude) :-
 
 
 apply_multiop(us_es(Us, Es), Is, O) =>
-    $(copy_term(Us-Es, [O|Is]-Es)).
+    copy_term(Us-Es, [O|Is]-Es).
 
 compile_multialg(Alg, CAlg) :-
     $(sort(Alg, SortedAlg)),

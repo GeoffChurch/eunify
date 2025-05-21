@@ -9,6 +9,12 @@ test(simple, all(X-Y == [0-0, 1-1])) :-
     unifd(Alg, s(#(X)) = s(s(s(#(Y))))),
     label([X,Y]).
 
+test(simple_fail) :-
+    compile_multialg([s(0)-1, s(1)-0], Alg),
+    X in 0..2,
+    unifd(Alg, s(#(X)) = s(s(#(X)))),
+    \+ label([X]).
+
 test(inference, all(C0-C2 == [0-2])) :-
     [C0, C2] ins 0..2,
     compile_multialg([z-0, s(0)-1, s(1)-C2, s(2)-C0], Alg),
