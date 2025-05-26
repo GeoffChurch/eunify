@@ -13,10 +13,12 @@ apply_alg(Alg, Term, Out) =>
     $(rb_lookup(F, Mop, Alg)),
     apply_op(Mop, Args, Out).
 
+:- meta_predicate cata(2, ?, ?).
 cata(F, A, B) :-
     $(rb_empty(Seen)),
     cata_(F, Seen, A, B).
 
+:- meta_predicate cata_(2, +, ?, ?).
 cata_(_, _, Var, _), var(Var) =>
     throw(error(instantiation_error(Var),
           context(_Loc, "Variables must be wrapped with (?)/1"))).
