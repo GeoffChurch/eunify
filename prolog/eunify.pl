@@ -50,19 +50,13 @@ compile_op(Type, Cases, i_o_state(IVars, OVar, State)) :-
     $(Cases = [Is-_|_]),
     $(length(Is, Arity)),
     $(length(IVars, Arity)),
-    $(term_variables_excluding(Cases, State, [OVar|IVars])),
+    $(term_variables(Cases, State)),
     $(post_op_constraint(Type, Cases, IVars, OVar)).
 
 post_op_constraint(or_and_eq(Or, And, Eq), Cases, IVars, OVar) =>
     $(maplist(case_constraint(or_and_eq(Or, And, Eq), IVars, OVar), Cases, [C|Cs])),
     $(foldl(cons(Or), Cs, C, Expr)),
     $(call(Expr)).
-
-term_variables_excluding(Term, Vars, Exclude) :-
-    $(term_variables(Term, All)),
-    $(list_to_ord_set(All, AllS)),
-    $(list_to_ord_set(Exclude, ExcludeS)),
-    $(ord_subtract(AllS, ExcludeS, Vars)).
 
 case_constraint(or_and_eq(_, And, Eq), Ins, Out, Args-Value, Expr) =>
     $(maplist(cons(Eq), Ins, Args, Conjs)),
