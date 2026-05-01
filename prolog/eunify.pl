@@ -1,4 +1,4 @@
-:- module(eunify, [eunify/2, pairs_to_alg/3, pairs_to_clpfd_alg/2]).
+:- module(eunify, [eunify/2, pairs_to_clpfd_alg/2]).
 
 term_functor_args(Term, N/A, Args) :-
     $(functor(Term, N, A)),
@@ -37,31 +37,29 @@ eunify(Alg, X = Y) =>
 
 %%% Helpers for constructing an algebra %%%
 
-pairs_to_clpfd_alg --> pairs_to_alg(or_and_eq(#\/, #/\, #=)).
-
-pairs_to_alg(Type, Pairs, CAlg) :-
+pairs_to_clpfd_alg(Pairs, CAlg) :-
     $(pairs_functions_ops(Pairs, Functions, Ops)),
     $(pairs_keys_values(FToMopPairs, Functions, Ops)),
     $(group_pairs_by_key(FToMopPairs, CAlgList)),
     $(list_to_rbtree(CAlgList, CAlgRB)),
-    $(rb_map(CAlgRB, compile_op(Type), CAlg)).
+    $(rb_map(CAlgRB, compile_op, CAlg)).
 
-compile_op(Type, Cases, i_o_state(IVars, OVar, State)) :-
+compile_op(Cases, i_o_state(IVars, OVar, State)) :-
     $(Cases = [Is-_|_]),
     $(length(Is, Arity)),
     $(length(IVars, Arity)),
     $(term_variables(Cases, State)),
-    $(post_op_constraint(Type, Cases, IVars, OVar)).
+    $(post_op_constraint(Cases, IVars, OVar)).
 
-post_op_constraint(or_and_eq(Or, And, Eq), Cases, IVars, OVar) =>
-    $(maplist(case_constraint(or_and_eq(Or, And, Eq), IVars, OVar), Cases, [C|Cs])),
-    $(foldl(cons(Or), Cs, C, Expr)),
+post_op_constraint(Cases, IVars, OVar) =>
+    $(maplist(case_constraint(IVars, OVar), Cases, [C|Cs])),
+    $(foldl(cons(#\/), Cs, C, Expr)),
     $(call(Expr)).
 
-case_constraint(or_and_eq(_, And, Eq), Ins, Out, Args-Value, Expr) =>
-    $(maplist(cons(Eq), Ins, Args, Conjs)),
-    cons(Eq, Out, Value, Conj1),
-    $(foldl(cons(And), Conjs, Conj1, Expr)).
+case_constraint(Ins, Out, Args-Value, Expr) =>
+    $(maplist(cons(#=), Ins, Args, Conjs)),
+    cons(#=, Out, Value, Conj1),
+    $(foldl(cons(#/\), Conjs, Conj1, Expr)).
 
 pairs_functions_ops(Alg, Functions, Ops) :-
     $(sort(Alg, SortedAlg)),
