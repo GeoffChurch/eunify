@@ -37,9 +37,9 @@ Each backend module exports `pairs_to_alg/2` to compile an algebra and
 true.
 
 ?- pairs_to_alg([z-0, s(0)-1, s(1)-0], _Alg),
-   rb_visit(_Alg, Pairs).
-Pairs = [s/1-i_o_state([_A], _B, []),
-         z/0-i_o_state([], 0, [])],
+   rb_visit(_Alg, Alg).
+Alg = [s/1-i_o_state([_A], _B, []),
+       z/0-i_o_state([], 0, [])],
 clpfd:in(_C, ..(0, 1)),
 clpfd: #<==>(#\/(_C, _D), 1),
 clpfd: #<==>(#/\(_E, _F), _C),
@@ -62,9 +62,9 @@ clpfd:in(_H, ..(0, 1)).
 true.
 
 ?- pairs_to_alg([z-0, s(0)-1, s(1)-0], _Alg),
-   rb_visit(_Alg, Pairs).
-Pairs = [s/1-[[0]-1, [1]-0],
-         z/0-[[]-0]].
+   rb_visit(_Alg, Alg).
+Alg = [s/1-[[0]-1, [1]-0],
+       z/0-[[]-0]].
 ```
 
 </td></tr>
@@ -93,10 +93,10 @@ skeleton and its application.
 
 ```prolog
 ?- pairs_to_alg([x-X, y-Y, f(0,1)-1], _Alg),
-   rb_visit(_Alg, Pairs).
-Pairs = [f/2-i_o_state([0, 1], 1, []),
-         x/0-i_o_state([], X, [X]),
-         y/0-i_o_state([], Y, [Y])],
+   rb_visit(_Alg, Alg).
+Alg = [f/2-i_o_state([0, 1], 1, []),
+       x/0-i_o_state([], X, [X]),
+       y/0-i_o_state([], Y, [Y])],
 clpfd:in(X, ..(inf, sup)),
 clpfd:in(Y, ..(inf, sup)).
 ```
@@ -105,10 +105,10 @@ clpfd:in(Y, ..(inf, sup)).
 
 ```prolog
 ?- pairs_to_alg([x-X, y-Y, f(0,1)-1], _Alg),
-   rb_visit(_Alg, Pairs).
-Pairs = [f/2-[[0, 1]-1],
-         x/0-[[]-X],
-         y/0-[[]-Y]].
+   rb_visit(_Alg, Alg).
+Alg = [f/2-[[0, 1]-1],
+       x/0-[[]-X],
+       y/0-[[]-Y]].
 ```
 
 </td></tr>
@@ -122,26 +122,26 @@ E-unification then determines values for `X` and `Y`, grounding the algebra:
 
 ```prolog
 ?- pairs_to_alg([x-X, y-Y, f(0,1)-1], _Alg),
-   rb_visit(_Alg, Pairs),
+   rb_visit(_Alg, Alg),
    eunify(apply_alg(_Alg), f(x, y) = ?(Z)).
 X = 0,
 Y = Z, Z = 1,
-Pairs = [f/2-i_o_state([0, 1], 1, []),
-         x/0-i_o_state([], 0, [0]),
-         y/0-i_o_state([], 1, [1])].
+Alg = [f/2-i_o_state([0, 1], 1, []),
+       x/0-i_o_state([], 0, [0]),
+       y/0-i_o_state([], 1, [1])].
 ```
 
 </td><td valign="top">
 
 ```prolog
 ?- pairs_to_alg([x-X, y-Y, f(0,1)-1], _Alg),
-   rb_visit(_Alg, Pairs),
+   rb_visit(_Alg, Alg),
    eunify(apply_alg(_Alg), f(x, y) = ?(Z)).
 X = 0,
 Y = Z, Z = 1,
-Pairs = [f/2-[[0, 1]-1],
-         x/0-[[]-0],
-         y/0-[[]-1]].
+Alg = [f/2-[[0, 1]-1],
+       x/0-[[]-0],
+       y/0-[[]-1]].
 ```
 
 </td></tr>
